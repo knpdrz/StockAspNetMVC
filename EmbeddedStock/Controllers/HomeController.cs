@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using EmbeddedStock.Models;
-
+//TODO add category for ComponentType 
 namespace EmbeddedStock.Controllers
 {
     public class HomeController : Controller

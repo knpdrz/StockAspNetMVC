@@ -18,6 +18,7 @@ namespace EmbeddedStock.Data
         public DbSet<ComponentType> ComponentTypes { get; set; }
         public DbSet<Component> Components { get; set; }
         public DbSet<ComponentTypeCategory> ComponentTypeCategories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Category>().ToTable("Category");

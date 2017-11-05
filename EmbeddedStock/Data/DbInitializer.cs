@@ -13,11 +13,11 @@ namespace EmbeddedStock.Data
             context.Database.EnsureCreated();
 
             //check if there db was already created
-            if (context.Categories.Any())
+            if (context.Components.Any())
             {
                 return;
             }
-
+            
             var categories = new Category[]
             {
                 new Category{Name="IoT"},
@@ -33,7 +33,8 @@ namespace EmbeddedStock.Data
             }
 
             context.SaveChanges();
-
+           
+          
             var componentTypes = new ComponentType[]
             {
                 new ComponentType{ComponentName="Photon", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
@@ -53,16 +54,17 @@ namespace EmbeddedStock.Data
             }
 
             context.SaveChanges();
-
+            
             var components = new Component[]
             {
-                new Component{ComponentNumber=123, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="123", UserComment="m", CurrentLoanInformationId=2612 },
-                new Component{ComponentNumber=32, Status=ComponentStatus.Available, AdminComment="", SerialNo="32", UserComment="hdgm", CurrentLoanInformationId=1552 },
+                new Component{ComponentTypeID=componentTypes.Single(ct=>ct.ComponentName=="Photon").ComponentTypeID,
+                ComponentNumber=123, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="123", UserComment="m", CurrentLoanInformationId=2612 },
+                /*new Component{ComponentNumber=32, Status=ComponentStatus.Available, AdminComment="", SerialNo="32", UserComment="hdgm", CurrentLoanInformationId=1552 },
                 new Component{ComponentNumber=54, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="54", UserComment="mfdg", CurrentLoanInformationId=142 },
                 new Component{ComponentNumber=234, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="234", UserComment="mhg", CurrentLoanInformationId=112 },
                 new Component{ComponentNumber=653, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="653", UserComment="mdg", CurrentLoanInformationId=162 },
-                new Component{ComponentNumber=676, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="676", UserComment="mgh", CurrentLoanInformationId=142 },
-
+                new Component{ComponentNumber=676, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="676", UserComment="mgh", CurrentLoanInformationId=142 }
+                */
 
             };
 
@@ -73,7 +75,7 @@ namespace EmbeddedStock.Data
             }
 
             context.SaveChanges();
-
+            
             var ctc = new ComponentTypeCategory[]
            {
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="IoT").CategoryID,
@@ -99,6 +101,7 @@ namespace EmbeddedStock.Data
             }
 
             context.SaveChanges();
+            
         }
 
 
