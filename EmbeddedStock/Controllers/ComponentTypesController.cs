@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EmbeddedStock.Data;
 using EmbeddedStock.Models;
+using EmbeddedStock.Models.StockViewModels;
 
 namespace EmbeddedStock.Controllers
 {
@@ -19,10 +20,29 @@ namespace EmbeddedStock.Controllers
             _context = context;
         }
 
-        // GET: ComponentTypes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(long? id)
         {
-            return View(await _context.ComponentTypes.ToListAsync());
+            var viewModel = new ComponentTypeIndexData();
+
+            viewModel.ComponentTypes = await _context.ComponentTypes
+                .Include(ct => ct.ComponentTypeCategories)
+                 .ThenInclude(ct => ct.Category)
+                 .AsNoTracking()
+                 .ToListAsync();
+
+            //TODO
+            //not needed part actually
+            if (id != null)
+            {
+                ViewData["ComponentTypeID"] = id.Value;
+                ComponentType componentType = viewModel.ComponentTypes.Where(
+                    ct => ct.ComponentTypeID == id.Value).Single();
+                viewModel.Categories = componentType.ComponentTypeCategories
+                    .Select(s => s.Category);
+            }
+
+            
+            return View(viewModel);
         }
 
         // GET: ComponentTypes/Details/5
@@ -33,8 +53,20 @@ namespace EmbeddedStock.Controllers
                 return NotFound();
             }
 
-            var componentType = await _context.ComponentTypes
-                .SingleOrDefaultAsync(m => m.ComponentTypeID == id);
+            var viewModel = new ComponentTypeIndexData();
+
+            viewModel.ComponentTypes = await _context.ComponentTypes
+                .Include(ct => ct.ComponentTypeCategories)
+                 .ThenInclude(ct => ct.Category)
+                 .AsNoTracking()
+                 .ToListAsync();
+
+            ComponentType componentType = viewModel.ComponentTypes.Where(
+                    ct => ct.ComponentTypeID == id.Value).Single();
+            viewModel.Categories = componentType.ComponentTypeCategories
+                .Select(s => s.Category);
+
+            
             if (componentType == null)
             {
                 return NotFound();
@@ -50,12 +82,13 @@ namespace EmbeddedStock.Controllers
         }
 
         // POST: ComponentTypes/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ComponentTypeID,ComponentName,ComponentInfo,Location,Status,Datasheet,ImageUrl,Manufacturer,WikiLink,AdminComment")] ComponentType componentType)
         {
+            //TODO
+            //at the moment it's impossible to add a category to a component type during component type creation
+            //but it can be done from 'edit' page
             if (ModelState.IsValid)
             {
                 _context.Add(componentType);
@@ -73,47 +106,120 @@ namespace EmbeddedStock.Controllers
                 return NotFound();
             }
 
-            var componentType = await _context.ComponentTypes.SingleOrDefaultAsync(m => m.ComponentTypeID == id);
+            var componentType = await _context.ComponentTypes
+                .Include(ct => ct.ComponentTypeCategories)
+                    .ThenInclude(ct => ct.Category)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.ComponentTypeID == id);
+
             if (componentType == null)
             {
                 return NotFound();
             }
+            PopulateCategoryData(componentType);
             return View(componentType);
         }
 
+        private void PopulateCategoryData(ComponentType componentType)
+        {
+            var allCategories = _context.Categories;
+            var ctCategories = new HashSet<int>(
+                componentType.ComponentTypeCategories
+                .Select(ctc => ctc.CategoryID));
+            var viewModel = new List<CategoryData>();
+            foreach(var category in allCategories)
+            {
+                viewModel.Add(new CategoryData
+                {
+                    CategoryID = category.CategoryID,
+                    Name = category.Name,
+                    Assigned = ctCategories.Contains(category.CategoryID)
+                });
+            }
+
+            ViewData["Categories"] = viewModel;
+        }
+
         // POST: ComponentTypes/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("ComponentTypeID,ComponentName,ComponentInfo,Location,Status,Datasheet,ImageUrl,Manufacturer,WikiLink,AdminComment")] ComponentType componentType)
+        public async Task<IActionResult> Edit(long? id, string[] selectedCategories)
         {
-            if (id != componentType.ComponentTypeID)
+            //TODO 
+            //add validation
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var ctToUpdate = await _context.ComponentTypes
+                .Include(ct => ct.ComponentTypeCategories)
+                    .ThenInclude(ct => ct.Category)
+                .SingleOrDefaultAsync(m => m.ComponentTypeID == id);
+
+            if(await TryUpdateModelAsync<ComponentType>(
+                ctToUpdate,
+                "",
+                ct => ct.ComponentName,
+                ct => ct.ComponentInfo,
+                ct => ct.Location,
+                ct => ct.Status,
+                ct => ct.Datasheet,
+                ct => ct.ImageUrl,
+                ct => ct.Manufacturer,
+                ct => ct.AdminComment))
             {
+                UpdateComponentTypeCategories(selectedCategories, ctToUpdate);
                 try
                 {
-                    _context.Update(componentType);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException)
                 {
-                    if (!ComponentTypeExists(componentType.ComponentTypeID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("", "unable to save, try again or ask admin");
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(componentType);
+            UpdateComponentTypeCategories(selectedCategories, ctToUpdate);
+            PopulateCategoryData(ctToUpdate);
+            return View(ctToUpdate);
+            
+        }
+
+        private void UpdateComponentTypeCategories(string[] selectedCategories, ComponentType ctToUpdate)
+        {
+            if(selectedCategories == null)
+            {
+                ctToUpdate.ComponentTypeCategories = new List<ComponentTypeCategory>();
+                return;
+            }
+            var selectedCategoriesHS = new HashSet<string>(selectedCategories);
+            var ctCourses = new HashSet<int>
+                (ctToUpdate.ComponentTypeCategories.Select(ct => ct.Category.CategoryID));
+
+            foreach(var category in _context.Categories)
+            {
+                if (selectedCategoriesHS.Contains(category.CategoryID.ToString()))
+                {
+                    if(!ctCourses.Contains(category.CategoryID))
+                    {
+                        ctToUpdate.ComponentTypeCategories.Add(new ComponentTypeCategory
+                        {
+                            ComponentTypeID = ctToUpdate.ComponentTypeID,
+                            CategoryID = category.CategoryID
+                        });
+                    }
+                }
+                else
+                {
+                    if (ctCourses.Contains(category.CategoryID))
+                    {
+                        ComponentTypeCategory categoryToRemove =
+                            ctToUpdate.ComponentTypeCategories
+                            .SingleOrDefault(ct => ct.CategoryID == category.CategoryID);
+                    }
+                }
+            }
         }
 
         // GET: ComponentTypes/Delete/5
@@ -139,8 +245,12 @@ namespace EmbeddedStock.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            var componentType = await _context.ComponentTypes.SingleOrDefaultAsync(m => m.ComponentTypeID == id);
+            var componentType = await _context.ComponentTypes
+                .Include(ct => ct.ComponentTypeCategories)
+                .SingleAsync(ct => ct.ComponentTypeID == id);
+
             _context.ComponentTypes.Remove(componentType);
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

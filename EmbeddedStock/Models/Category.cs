@@ -7,11 +7,6 @@ namespace EmbeddedStock.Models
 {
     public class Category
     {
-        public Category()
-        {
-            //ComponentTypes = new List<ComponentType>();
-
-        }
         public int CategoryID { get; set; }
         public string Name { get; set; }
 

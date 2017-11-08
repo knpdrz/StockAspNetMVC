@@ -91,7 +91,9 @@ namespace EmbeddedStock.Data
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="PC").CategoryID,
                     ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Dell Inspiron").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="PC").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Lenovo 342").ComponentTypeID}
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Lenovo 342").ComponentTypeID},
+                new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="IoT").CategoryID,
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="LG G6").ComponentTypeID}
            };
 
             

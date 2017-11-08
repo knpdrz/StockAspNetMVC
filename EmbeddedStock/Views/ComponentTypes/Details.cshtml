@@ -64,6 +64,18 @@
         <dd>
             @Html.DisplayFor(model => model.AdminComment)
         </dd>
+        <dt>
+            Categories
+        </dt>
+        <dd>
+            @{ 
+                foreach(var category in Model.ComponentTypeCategories)
+                {
+                    @category.Category.Name<br/>
+
+                }
+            }
+        </dd>
     </dl>
 </div>
 <div>
