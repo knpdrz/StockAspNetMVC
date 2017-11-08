@@ -1,0 +1,98 @@
+﻿@model EmbeddedStock.Models.StockViewModels.ComponentIndexData
+
+@{
+    ViewData["Title"] = "Components of one type";
+
+}
+
+<h2>Selected components with component type id = @ViewData["ComponentTypeID"] </h2>
+
+<div class="form-group">
+    <label class="control-label">Component types</label>
+    <div class="col-md-offset-2 col-md-10">
+        <ul>
+            <li>
+                <a asp-action="Index">
+                    All Component Types
+                </a>
+             </li>
+            @{ 
+                List<EmbeddedStock.Models.StockViewModels.ComponentTypeData> componentTypes = ViewBag.ComponentTypes;
+                foreach(var componentType in componentTypes)
+                {
+                    @:<li>
+                    <a asp-action="Selected" asp-route-id="@componentType.ComponentTypeID">
+                            @componentType.ComponentTypeName
+                        
+                    </a>
+                    @:</li>
+
+                }
+            }
+        </ul>
+    </div>
+</div>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    ComponentID
+                </th>
+                <th>
+                    SerialNo
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    AdminComment
+                </th>
+                <th>
+                    UserComment
+                </th>
+                <th>
+                    CurrentLoanInformationId
+                </th>
+                <th>
+                    ComponentType
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Components) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ComponentNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SerialNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdminComment)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserComment)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CurrentLoanInformationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ComponentType.ComponentTypeName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ComponentID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ComponentID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ComponentID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

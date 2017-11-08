@@ -1,10 +1,43 @@
 ﻿@model EmbeddedStock.Models.StockViewModels.ComponentTypeIndexData
 
 @{
-    ViewData["Title"] = "ComponentTypes";
+    ViewData["Title"] = "ComponentTypes of one category";
 }
 
-<h2>Component types</h2>
+<h2>Component types with category id = @ViewData["CategoryID"]</h2>
+
+
+<div class="form-group">
+    <label class="control-label">Categories</label>
+    <div class="col-md-offset-2 col-md-10">
+        <ul>
+            <li>
+                <a asp-action="Index">
+                    All Component Types
+                </a>
+            </li>
+            @{
+                List<EmbeddedStock.Models.StockViewModels.CategoryData> categories = ViewBag.Categories;
+                foreach (var category in categories)
+                {
+                    
+                    @:<li>
+                        <a asp-action="Selected" asp-route-id="@category.CategoryID">
+                            @category.Name
+
+                        </a>
+                      
+                    @:</li>
+
+
+                }
+
+            }
+        </ul>
+    </div>
+</div>
+
+
 
 <p>
     <a asp-action="Create">Create New</a>

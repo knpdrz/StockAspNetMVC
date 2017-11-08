@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EmbeddedStock.Data;
 using EmbeddedStock.Models;
 using System.Diagnostics;
+using EmbeddedStock.Models.StockViewModels;
 
 namespace EmbeddedStock.Controllers
 {
@@ -23,8 +24,54 @@ namespace EmbeddedStock.Controllers
         // GET: Components
         public async Task<IActionResult> Index()
         {
-            var stockContext = _context.Components.Include(c => c.ComponentType);
-            return View(await stockContext.ToListAsync());
+            PopulateComponentTypeList();
+            var viewModel = new ComponentIndexData();
+            viewModel.Components = await _context.Components
+                .Include(c => c.ComponentType)
+                .ToListAsync();
+           
+            return View("Selected", viewModel);
+        }
+
+        public async Task<IActionResult> Selected(int? id)
+        {
+            PopulateComponentTypeList();
+
+            if(id == null)
+            {
+                //show all components
+                return View(await _context.Components.ToListAsync());
+            }
+
+            ViewData["ComponentTypeID"] = id;
+
+            var components = await _context.Components
+                .Where(c => c.ComponentType.ComponentTypeID == id)
+                .Include(c => c.ComponentType)
+                .ToListAsync();
+
+            var viewModel = new ComponentIndexData();
+            viewModel.Components = components;
+            return View(viewModel);
+
+        }
+
+        private void PopulateComponentTypeList()
+        {
+            var allCT = _context.ComponentTypes;
+           
+            var list = new List<ComponentTypeData>();
+            foreach (var componentType in allCT)
+            {
+                list.Add(new ComponentTypeData
+                {
+                    ComponentTypeID = componentType.ComponentTypeID,
+                    ComponentTypeName = componentType.ComponentTypeName
+
+                });
+            }
+
+            ViewData["ComponentTypes"] = list;
         }
 
         // GET: Components/Details/5
@@ -42,7 +89,8 @@ namespace EmbeddedStock.Controllers
             {
                 return NotFound();
             }
-            
+            ViewData["id"] = id;
+
             return View(component);
         }
 

@@ -11,7 +11,7 @@ namespace EmbeddedStock.Models
     {
         
         public long ComponentTypeID { get; set; }
-        public string ComponentName { get; set; }
+        public string ComponentTypeName { get; set; }
         public string ComponentInfo { get; set; }
         public string Location { get; set; }
         public ComponentTypeStatus Status { get; set; }

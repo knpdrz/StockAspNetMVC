@@ -20,8 +20,10 @@ namespace EmbeddedStock.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(long? id)
+        public async Task<IActionResult> Index()
         {
+            PopulateCategoriesList();
+
             var viewModel = new ComponentTypeIndexData();
 
             viewModel.ComponentTypes = await _context.ComponentTypes
@@ -29,20 +31,66 @@ namespace EmbeddedStock.Controllers
                  .ThenInclude(ct => ct.Category)
                  .AsNoTracking()
                  .ToListAsync();
+            
+            return View("Selected",viewModel);
+        }
 
-            //TODO
-            //not needed part actually
-            if (id != null)
+        public async Task<IActionResult> Selected(int? id)
+        {
+            PopulateCategoriesList();
+
+            if (id == null)
             {
-                ViewData["ComponentTypeID"] = id.Value;
-                ComponentType componentType = viewModel.ComponentTypes.Where(
-                    ct => ct.ComponentTypeID == id.Value).Single();
-                viewModel.Categories = componentType.ComponentTypeCategories
-                    .Select(s => s.Category);
+                //show all component types
+                return View(await _context.ComponentTypes.ToListAsync());
             }
 
+            ViewData["CategoryID"] = id;
+
+            var viewModel = new ComponentTypeIndexData();
+
+
+            var category = await _context.Categories
+                .Include(c => c.ComponentTypeCategories)
+                    .ThenInclude(c => c.ComponentType)
+                .SingleAsync(c => c.CategoryID == id);
             
+            var selectedComponentTypeIds = new List<long>();
+
+
+            foreach (var ctc in category.ComponentTypeCategories)
+            {
+                selectedComponentTypeIds.Add(ctc.ComponentType.ComponentTypeID);
+            }
+
+            var componentTypes = await _context.ComponentTypes
+                .Where(ct => selectedComponentTypeIds.Contains(ct.ComponentTypeID))
+                .Include(ct => ct.ComponentTypeCategories)
+                    .ThenInclude(ct => ct.Category)
+                .ToListAsync();
+
+            viewModel.ComponentTypes = componentTypes;
+
             return View(viewModel);
+        }
+
+        private void PopulateCategoriesList()
+        {
+            var allCategories = _context.Categories;
+
+            var list = new List<CategoryData>();
+            foreach (var category in allCategories)
+            {
+                list.Add(new CategoryData
+                {
+                    CategoryID = category.CategoryID,
+                    Name = category.Name,
+                    Assigned = true
+
+                });
+            }
+
+            ViewData["Categories"] = list;
         }
 
         // GET: ComponentTypes/Details/5
@@ -65,8 +113,7 @@ namespace EmbeddedStock.Controllers
                     ct => ct.ComponentTypeID == id.Value).Single();
             viewModel.Categories = componentType.ComponentTypeCategories
                 .Select(s => s.Category);
-
-            
+                        
             if (componentType == null)
             {
                 return NotFound();
@@ -84,7 +131,7 @@ namespace EmbeddedStock.Controllers
         // POST: ComponentTypes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ComponentTypeID,ComponentName,ComponentInfo,Location,Status,Datasheet,ImageUrl,Manufacturer,WikiLink,AdminComment")] ComponentType componentType)
+        public async Task<IActionResult> Create([Bind("ComponentTypeID,ComponentTypeName,ComponentInfo,Location,Status,Datasheet,ImageUrl,Manufacturer,WikiLink,AdminComment")] ComponentType componentType)
         {
             //TODO
             //at the moment it's impossible to add a category to a component type during component type creation
@@ -160,7 +207,7 @@ namespace EmbeddedStock.Controllers
             if(await TryUpdateModelAsync<ComponentType>(
                 ctToUpdate,
                 "",
-                ct => ct.ComponentName,
+                ct => ct.ComponentTypeName,
                 ct => ct.ComponentInfo,
                 ct => ct.Location,
                 ct => ct.Status,

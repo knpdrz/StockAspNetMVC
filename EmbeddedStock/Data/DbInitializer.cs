@@ -37,13 +37,13 @@ namespace EmbeddedStock.Data
           
             var componentTypes = new ComponentType[]
             {
-                new ComponentType{ComponentName="Photon", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
-                new ComponentType{ComponentName="Electron", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
-                new ComponentType{ComponentName="Samsung Galaxy s7", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
-                new ComponentType{ComponentName="LG G6", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
-                new ComponentType{ComponentName="Lenovo 342", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
-                new ComponentType{ComponentName="Dell XPS 1000", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
-                new ComponentType{ComponentName="Dell Inspiron", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.ReservedAdmin}
+                new ComponentType{ComponentTypeName="Photon", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
+                new ComponentType{ComponentTypeName="Electron", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
+                new ComponentType{ComponentTypeName="Samsung Galaxy s7", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
+                new ComponentType{ComponentTypeName="LG G6", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
+                new ComponentType{ComponentTypeName="Lenovo 342", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
+                new ComponentType{ComponentTypeName="Dell XPS 1000", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.Available},
+                new ComponentType{ComponentTypeName="Dell Inspiron", ComponentInfo="", AdminComment="", Datasheet="", ImageUrl="",Manufacturer="",WikiLink="",Location="", Image=new ESImage(), Status=ComponentTypeStatus.ReservedAdmin}
 
             };
 
@@ -57,7 +57,7 @@ namespace EmbeddedStock.Data
             
             var components = new Component[]
             {
-                new Component{ComponentTypeID=componentTypes.Single(ct=>ct.ComponentName=="Photon").ComponentTypeID,
+                new Component{ComponentTypeID=componentTypes.Single(ct=>ct.ComponentTypeName=="Photon").ComponentTypeID,
                 ComponentNumber=123, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="123", UserComment="m", CurrentLoanInformationId=2612 },
                 /*new Component{ComponentNumber=32, Status=ComponentStatus.Available, AdminComment="", SerialNo="32", UserComment="hdgm", CurrentLoanInformationId=1552 },
                 new Component{ComponentNumber=54, Status=ComponentStatus.ReservedAdmin, AdminComment="", SerialNo="54", UserComment="mfdg", CurrentLoanInformationId=142 },
@@ -79,21 +79,21 @@ namespace EmbeddedStock.Data
             var ctc = new ComponentTypeCategory[]
            {
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="IoT").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Photon").ComponentTypeID},
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="Photon").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="IoT").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Electron").ComponentTypeID},
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="Electron").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="Smartphone").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Samsung Galaxy s7").ComponentTypeID},
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="Samsung Galaxy s7").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="Smartphone").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="LG G6").ComponentTypeID},
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="LG G6").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="PC").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Dell XPS 1000").ComponentTypeID},
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="Dell XPS 1000").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="PC").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Dell Inspiron").ComponentTypeID},
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="Dell Inspiron").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="PC").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="Lenovo 342").ComponentTypeID},
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="Lenovo 342").ComponentTypeID},
                 new ComponentTypeCategory{CategoryID = categories.Single(c=>c.Name=="IoT").CategoryID,
-                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentName=="LG G6").ComponentTypeID}
+                    ComponentTypeID = componentTypes.Single(ct=> ct.ComponentTypeName=="LG G6").ComponentTypeID}
            };
 
             
