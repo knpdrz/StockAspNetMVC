@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using EmbeddedStock.Models;
-//TODO add category for ComponentType 
 // https://docs.microsoft.com/pl-pl/aspnet/core/data/ef-mvc/complex-data-model#seed-the-database-with-test-data
 namespace EmbeddedStock.Controllers
 {
