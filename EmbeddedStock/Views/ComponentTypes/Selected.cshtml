@@ -3,8 +3,18 @@
 @{
     ViewData["Title"] = "ComponentTypes of one category";
 }
+@{ 
+    if((string)(ViewData["CategoryName"]) == "all")
+    {
+        @:<h2>All component types</h2>
 
-<h2>Component types with category id = @ViewData["CategoryID"]</h2>
+    }
+    else
+    {
+        @:<h2>Component types with category @ViewData["CategoryName"]</h2>
+        
+    }
+}
 
 
 <div class="form-group">
@@ -46,31 +56,36 @@
     <thead>
         <tr>
                 <th>
-                    ComponentTypeName
+                    @Html.DisplayNameFor(model => model.ComponentType.ComponentTypeName)
                 </th>
                 <th>
-                    ComponentInfo
+                    @Html.DisplayNameFor(model => model.ComponentType.ComponentInfo)
                 </th>
                 <th>
-                    Location
+                    @Html.DisplayNameFor(model => model.ComponentType.Location)
                 </th>
                 <th>
-                   Status
+                   @Html.DisplayNameFor(model => model.ComponentType.Status)
+
                 </th>
                 <th>
-                    Datasheet
+                    @Html.DisplayNameFor(model => model.ComponentType.Datasheet)
+
                 </th>
                 <th>
-                    ImageUrl
+                    @Html.DisplayNameFor(model => model.ComponentType.ImageUrl)
+
                 </th>
                 <th>
-                    Manufacturer
+                    @Html.DisplayNameFor(model => model.ComponentType.Manufacturer)
+
                 </th>
                 <th>
-                    WikiLink
+                    @Html.DisplayNameFor(model => model.ComponentType.WikiLink)
+
                 </th>
                 <th>
-                    AdminComment                    
+                    @Html.DisplayNameFor(model => model.ComponentType.AdminComment)
                 </th>
                 <th>
                     Categories

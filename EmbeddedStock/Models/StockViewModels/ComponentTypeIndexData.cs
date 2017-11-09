@@ -9,5 +9,6 @@ namespace EmbeddedStock.Models.StockViewModels
     {
         public IEnumerable<ComponentType> ComponentTypes { get; set; }
         public IEnumerable<Category> Categories { get; set; }
+        public ComponentType ComponentType { get; set; }
     }
 }

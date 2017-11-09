@@ -3,8 +3,19 @@
 @{
     ViewData["Title"] = "Index";
 }
+@{
+    if ((string)(ViewData["CTName"]) == "all")
+    {
+        @:<h2>All components</h2>
+    }
+    else
+    {
 
-<h2>Index</h2>
+        @:<h2>Components with component type @ViewData["CTName"] </h2>
+
+
+    }
+}
 
 <p>
     <a asp-action="Create">Create New</a>

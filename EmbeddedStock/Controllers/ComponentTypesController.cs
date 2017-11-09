@@ -24,6 +24,8 @@ namespace EmbeddedStock.Controllers
         {
             PopulateCategoriesList();
 
+            ViewData["CategoryName"] = "all";
+
             var viewModel = new ComponentTypeIndexData();
 
             viewModel.ComponentTypes = await _context.ComponentTypes
@@ -48,13 +50,14 @@ namespace EmbeddedStock.Controllers
             ViewData["CategoryID"] = id;
 
             var viewModel = new ComponentTypeIndexData();
-
-
+            
             var category = await _context.Categories
                 .Include(c => c.ComponentTypeCategories)
                     .ThenInclude(c => c.ComponentType)
                 .SingleAsync(c => c.CategoryID == id);
-            
+
+            ViewData["CategoryName"] = category.Name;
+
             var selectedComponentTypeIds = new List<long>();
 
 
@@ -125,24 +128,58 @@ namespace EmbeddedStock.Controllers
         // GET: ComponentTypes/Create
         public IActionResult Create()
         {
+           PopulateCategoryData();
+
             return View();
         }
 
         // POST: ComponentTypes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ComponentTypeID,ComponentTypeName,ComponentInfo,Location,Status,Datasheet,ImageUrl,Manufacturer,WikiLink,AdminComment")] ComponentType componentType)
+        public async Task<IActionResult> Create([Bind("ComponentTypeID,ComponentTypeName,ComponentInfo,Location,Status,Datasheet,ImageUrl,Manufacturer,WikiLink,AdminComment")] ComponentType componentType,
+            string[] selectedCategories)
         {
-            //TODO
-            //at the moment it's impossible to add a category to a component type during component type creation
-            //but it can be done from 'edit' page
+            //selected category ids are in selectedCategories array
+            AddComponentTypeCategories(selectedCategories, componentType);
             if (ModelState.IsValid)
             {
+                
                 _context.Add(componentType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+
             }
+            PopulateCategoryData(componentType);
             return View(componentType);
+            
+        }
+
+        private void AddComponentTypeCategories(string[] selectedCategories, ComponentType ctToCreate)
+        {
+            //set categories of a new component to an empty list 
+            ctToCreate.ComponentTypeCategories = new List<ComponentTypeCategory>();
+                
+            if(selectedCategories == null)
+            {
+                //if no categories were selected, do nothing else
+                return;
+            }
+            var selectedCategoriesHS = new HashSet<string>(selectedCategories);
+           
+            foreach (var category in _context.Categories)
+            {
+                if (selectedCategoriesHS.Contains(category.CategoryID.ToString()))
+                {
+                    //if user selected this category, add it to component categories
+                    ctToCreate.ComponentTypeCategories.Add(new ComponentTypeCategory
+                    {
+                        ComponentTypeID = ctToCreate.ComponentTypeID,
+                        CategoryID = category.CategoryID
+                    });
+                    
+                }
+                
+            }
         }
 
         // GET: ComponentTypes/Edit/5
@@ -163,16 +200,27 @@ namespace EmbeddedStock.Controllers
             {
                 return NotFound();
             }
+
             PopulateCategoryData(componentType);
             return View(componentType);
         }
-
-        private void PopulateCategoryData(ComponentType componentType)
+        
+        private void PopulateCategoryData(ComponentType componentType = null)
         {
             var allCategories = _context.Categories;
-            var ctCategories = new HashSet<int>(
+            HashSet<int> ctCategoriesHS;
+            if (componentType == null)
+            {
+                ctCategoriesHS = new HashSet<int>();
+            }
+            else
+            {
+                ctCategoriesHS = new HashSet<int>(
                 componentType.ComponentTypeCategories
                 .Select(ctc => ctc.CategoryID));
+
+            }
+
             var viewModel = new List<CategoryData>();
             foreach(var category in allCategories)
             {
@@ -180,7 +228,7 @@ namespace EmbeddedStock.Controllers
                 {
                     CategoryID = category.CategoryID,
                     Name = category.Name,
-                    Assigned = ctCategories.Contains(category.CategoryID)
+                    Assigned = ctCategoriesHS.Contains(category.CategoryID)
                 });
             }
 
@@ -192,8 +240,6 @@ namespace EmbeddedStock.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long? id, string[] selectedCategories)
         {
-            //TODO 
-            //add validation
             if (id == null)
             {
                 return NotFound();
@@ -204,6 +250,14 @@ namespace EmbeddedStock.Controllers
                     .ThenInclude(ct => ct.Category)
                 .SingleOrDefaultAsync(m => m.ComponentTypeID == id);
 
+            if (!ModelState.IsValid)
+            {
+                PopulateCategoryData(ctToUpdate);
+
+                return View(ctToUpdate);
+            }
+
+            
             if(await TryUpdateModelAsync<ComponentType>(
                 ctToUpdate,
                 "",
@@ -264,6 +318,7 @@ namespace EmbeddedStock.Controllers
                         ComponentTypeCategory categoryToRemove =
                             ctToUpdate.ComponentTypeCategories
                             .SingleOrDefault(ct => ct.CategoryID == category.CategoryID);
+                        _context.Remove(categoryToRemove);
                     }
                 }
             }

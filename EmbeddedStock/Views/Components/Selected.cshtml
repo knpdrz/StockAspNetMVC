@@ -5,7 +5,17 @@
 
 }
 
-<h2>Selected components with component type id = @ViewData["ComponentTypeID"] </h2>
+@{ 
+    if((string)(ViewData["CTName"]) == "all"){
+        @:<h2>All components</h2>
+    }
+    else
+    {
+
+        @:<h2>Components with component type @ViewData["CTName"] </h2>
+
+    }
+}
 
 <div class="form-group">
     <label class="control-label">Component types</label>
@@ -39,27 +49,27 @@
 <table class="table">
     <thead>
         <tr>
-                <th>
-                    ComponentID
-                </th>
-                <th>
-                    SerialNo
-                </th>
-                <th>
-                    Status
-                </th>
-                <th>
-                    AdminComment
-                </th>
-                <th>
-                    UserComment
-                </th>
-                <th>
-                    CurrentLoanInformationId
-                </th>
-                <th>
-                    ComponentType
-                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Component.ComponentNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Component.SerialNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Component.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Component.AdminComment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Component.UserComment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Component.CurrentLoanInformationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Component.ComponentType)
+            </th>
             <th></th>
         </tr>
     </thead>

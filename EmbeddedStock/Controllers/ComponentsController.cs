@@ -24,6 +24,7 @@ namespace EmbeddedStock.Controllers
         // GET: Components
         public async Task<IActionResult> Index()
         {
+            ViewData["CTName"] = "all";
             PopulateComponentTypeList();
             var viewModel = new ComponentIndexData();
             viewModel.Components = await _context.Components
@@ -49,6 +50,12 @@ namespace EmbeddedStock.Controllers
                 .Where(c => c.ComponentType.ComponentTypeID == id)
                 .Include(c => c.ComponentType)
                 .ToListAsync();
+
+            var ct = _context.ComponentTypes
+                .Where(c => c.ComponentTypeID == id)
+                .Single();
+
+            ViewData["CTName"] = ct.ComponentTypeName;
 
             var viewModel = new ComponentIndexData();
             viewModel.Components = components;
@@ -97,7 +104,7 @@ namespace EmbeddedStock.Controllers
         // GET: Components/Create
         public IActionResult Create()
         {
-            ViewData["ComponentTypeID"] = new SelectList(_context.ComponentTypes, "ComponentTypeID", "ComponentTypeID");
+            ViewData["ComponentTypeID"] = new SelectList(_context.ComponentTypes, "ComponentTypeID", "ComponentTypeName");
             return View();
         }
 
@@ -121,7 +128,7 @@ namespace EmbeddedStock.Controllers
                 ModelState.AddModelError("", "unable to save changes, try again or ask admin");
             }
             
-           // ViewData["ComponentTypeID"] = new SelectList(_context.ComponentTypes, "ComponentTypeID", "ComponentTypeID", component.ComponentTypeID);
+            ViewData["ComponentTypeID"] = new SelectList(_context.ComponentTypes, "ComponentTypeID", "ComponentTypeName", component.ComponentTypeID);
             return View(component);
         }
 
@@ -138,7 +145,7 @@ namespace EmbeddedStock.Controllers
             {
                 return NotFound();
             }
-            ViewData["ComponentTypeID"] = new SelectList(_context.ComponentTypes, "ComponentTypeID", "ComponentTypeID", component.ComponentTypeID);
+            ViewData["ComponentTypeID"] = new SelectList(_context.ComponentTypes, "ComponentTypeID", "ComponentTypeName", component.ComponentTypeID);
             return View(component);
         }
 
